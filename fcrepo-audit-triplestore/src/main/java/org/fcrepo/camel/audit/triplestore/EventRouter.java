@@ -68,6 +68,10 @@ public class EventRouter extends RouteBuilder {
         from("direct:event")
             .routeId("AuditEventRouter")
             .setHeader(AuditHeaders.EVENT_BASE_URI, simple("{{event.baseUri}}"))
+            .choice()
+                .when()
+                .simple("${triplestore.authUsername}")
+                .setHeader('Authorization', "Basic " + "{{triplestore.authUsername}}:{{triplestore.authPassword}}".bytes.encodeBase64().toString())
             .process(new AuditSparqlProcessor())
             .log(LoggingLevel.INFO, "org.fcrepo.camel.audit",
                     "Audit Event: ${headers.CamelFcrepoUri} :: ${headers[CamelAuditEventUri]}")

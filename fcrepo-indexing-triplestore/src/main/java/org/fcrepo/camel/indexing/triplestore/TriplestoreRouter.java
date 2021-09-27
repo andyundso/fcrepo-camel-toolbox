@@ -27,6 +27,8 @@ import org.fcrepo.camel.processor.SparqlUpdateProcessor;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Base64;
+
 import static java.util.stream.Collectors.toList;
 import static org.apache.camel.builder.PredicateBuilder.in;
 import static org.apache.camel.builder.PredicateBuilder.not;
@@ -125,6 +127,16 @@ public class TriplestoreRouter extends RouteBuilder {
                 .process(new SparqlDeleteProcessor())
                 .log(LoggingLevel.INFO, LOGGER,
                         "Deleting Triplestore Object ${headers[CamelFcrepoUri]}")
+                .choice()
+                    .when((x) -> !config.getTriplestoreAuthUsername().isEmpty())
+                    .setHeader("Authorization", simple(
+                            "Basic " + Base64.getEncoder().encodeToString(
+                                    (config.getTriplestoreAuthUsername() +
+                                            ":" +
+                                            config.getTriplestorePassword()
+                                    ).getBytes()))
+                    )
+                    .end()
                 .to(config.getTriplestoreBaseUrl() + "?useSystemProperties=true");
 
         /**
@@ -139,6 +151,16 @@ public class TriplestoreRouter extends RouteBuilder {
                 .process(new SparqlUpdateProcessor())
                 .log(LoggingLevel.INFO, LOGGER,
                         "Indexing Triplestore Object ${headers[CamelFcrepoUri]}")
+                .choice()
+                    .when((x) -> !config.getTriplestoreAuthUsername().isEmpty())
+                    .setHeader("Authorization", simple(
+                            "Basic " + Base64.getEncoder().encodeToString(
+                                    (config.getTriplestoreAuthUsername() +
+                                            ":" +
+                                            config.getTriplestorePassword()
+                                    ).getBytes()))
+                    )
+                    .end()
                 .to(config.getTriplestoreBaseUrl() + "?useSystemProperties=true");
     }
 }

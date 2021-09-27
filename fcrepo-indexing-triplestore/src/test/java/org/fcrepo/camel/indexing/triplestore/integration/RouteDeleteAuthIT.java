@@ -24,6 +24,7 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.model.ModelCamelContext;
+import org.apache.jena.atlas.web.AuthScheme;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -61,9 +62,9 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {RouteUpdateIT.ContextConfig.class}, loader = AnnotationConfigContextLoader.class)
-public class RouteDeleteIT {
+public class RouteDeleteAuthIT {
 
-    final private Logger logger = getLogger(RouteDeleteIT.class);
+    final private Logger logger = getLogger(RouteDeleteAuthIT.class);
 
     private static FusekiServer server = null;
 
@@ -93,6 +94,8 @@ public class RouteDeleteIT {
         System.setProperty("triplestore.indexer.enabled", "true");
         System.setProperty("indexing.predicate", "true");
         System.setProperty("triplestore.baseUrl", "http://localhost:" + FUSEKI_PORT + "/fuseki/test/update");
+        System.setProperty("triplestore.authUsername", "admin");
+        System.setProperty("triplestore.authPassword", "password");
         System.setProperty("fcrepo.baseUrl", "http://localhost:" + FCREPO_PORT + "/fcrepo/rest");
         System.setProperty("jms.brokerUrl", "tcp://localhost:" + jmsPort);
         System.setProperty("triplestore.input.stream", "direct:start");
@@ -118,6 +121,8 @@ public class RouteDeleteIT {
                 .port(parseInt(FUSEKI_PORT))
                 .contextPath("/fuseki")
                 .add("/test", ds, true)
+                .passwordFile("src/test/resources/passwd")
+                .auth(AuthScheme.BASIC)
                 .build();
         server.start();
     }

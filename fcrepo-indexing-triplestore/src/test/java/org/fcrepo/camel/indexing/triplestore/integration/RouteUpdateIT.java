@@ -52,7 +52,7 @@ import java.net.URI;
 import static com.jayway.awaitility.Awaitility.await;
 import static java.lang.Integer.parseInt;
 import static org.apache.camel.util.ObjectHelper.loadResourceAsStream;
-import static org.fcrepo.camel.indexing.triplestore.integration.TestUtils.createClient;
+import static org.fcrepo.camel.indexing.triplestore.integration.TestUtils.createFcrepoClient;
 import static org.fcrepo.camel.indexing.triplestore.integration.TestUtils.getEvent;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -113,7 +113,7 @@ public class RouteUpdateIT {
 
     @Before
     public void setUpFuseki() throws Exception {
-        final FcrepoClient client = createClient();
+        final FcrepoClient client = createFcrepoClient();
         final FcrepoResponse res = client.post(URI.create("http://localhost:" + FCREPO_PORT + "/fcrepo/rest"))
                 .body(loadResourceAsStream("indexable.ttl"), "text/turtle").perform();
         fullPath = res.getLocation().toString();
