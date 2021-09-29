@@ -81,6 +81,7 @@ public class RouteUpdateAuthIT {
     private static final String JMS_PORT = System.getProperty(
             "fcrepo.dynamic.jms.port", "61616");
 
+    private static final String FCREPO_BASE_URL = "http://localhost:" + FCREPO_PORT + "/fcrepo/rest";
 
     @EndpointInject("mock:result")
     protected MockEndpoint resultEndpoint;
@@ -101,6 +102,7 @@ public class RouteUpdateAuthIT {
         System.setProperty("jms.brokerUrl", "tcp://localhost:" + JMS_PORT);
         System.setProperty("triplestore.input.stream", "direct:start");
         System.setProperty("triplestore.reindex.stream", "direct:reindex");
+        System.setProperty("fcrepo.baseUrl", FCREPO_BASE_URL);
     }
 
     @After
@@ -112,7 +114,7 @@ public class RouteUpdateAuthIT {
     @Before
     public void setUpFuseki() throws Exception {
         final FcrepoClient client = createFcrepoClient();
-        final FcrepoResponse res = client.post(URI.create("http://localhost:" + FCREPO_PORT + "/fcrepo/rest"))
+        final FcrepoResponse res = client.post(URI.create(FCREPO_BASE_URL))
                 .body(loadResourceAsStream("indexable.ttl"), "text/turtle").perform();
         fullPath = res.getLocation().toString();
         logger.info("full path {}", fullPath);
